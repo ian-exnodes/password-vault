@@ -170,16 +170,18 @@ When a phase satisfies its exit criteria, update this document and `docs/PROGRES
 
 ### Phase 0 — Product design and threat model
 
-Status: Not started
+Status: Completed (2026-09-04)
 
-- [ ] Define assets, trust boundaries, attackers, and abuse cases.
-- [ ] Specify the versioned encrypted-payload format and key lifecycle.
-- [ ] Define recovery, master-password change, and new-device flows.
-- [ ] Confirm the technical stack through small proofs of concept.
-- [ ] Produce mobile wireframes and accessibility requirements.
-- [ ] Define measurable acceptance criteria for every later phase.
+- [x] Define assets, trust boundaries, attackers, and abuse cases.
+- [x] Specify the versioned encrypted-payload format and key lifecycle.
+- [x] Define recovery, master-password change, and new-device flows.
+- [x] Confirm the technical stack through small proofs of concept.
+- [x] Produce mobile wireframes and accessibility requirements.
+- [x] Define measurable acceptance criteria for every later phase.
 
 Exit criteria: threat model, crypto specification, recovery specification, architecture decision record, and mobile wireframes have been reviewed.
+
+Phase record: see `docs/PROGRESS.md` and the reviewed artifacts under `docs/phase-0/`.
 
 ### Phase 1 — Mobile UI prototype
 
@@ -281,3 +283,7 @@ Use this document for phase/checklist status and `docs/PROGRESS.md` as the appen
 ### 2026-09-04 — Phase-based GitHub delivery
 
 Push to GitHub after an entire phase meets its exit criteria and its plan/progress documentation has been updated. Do not treat individual task completion as authorization to push, and do not push before the repository remote and branch are supplied.
+
+### 2026-09-04 — Phase 0 architecture baseline
+
+Use a Next.js/TypeScript modular monolith, PostgreSQL with Drizzle, Web Crypto AES-GCM, an Argon2id WASM candidate, SimpleWebAuthn, Zod, Vitest, Playwright, and Node.js 22 LTS. Passkeys authenticate users; quick vault unlock is offered only when WebAuthn PRF succeeds, otherwise the master password or Recovery Key remains required.

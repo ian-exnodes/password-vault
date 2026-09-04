@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Password Vault WebAuthn capability probe</title>
+  <body>
+    <h1>WebAuthn capability probe</h1>
+    <button id="probe" type="button">Check this device</button>
+    <pre id="result" aria-live="polite">Not checked</pre>
+    <script type="module">
+      document.querySelector("#probe").addEventListener("click", async () => {
+        const available = Boolean(window.PublicKeyCredential);
+        const platform = available && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+        const conditional = available && PublicKeyCredential.isConditionalMediationAvailable
+          ? await PublicKeyCredential.isConditionalMediationAvailable()
+          : false;
+        document.querySelector("#result").textContent = JSON.stringify({
+          secureContext: window.isSecureContext,
+          webAuthn: available,
+          platformAuthenticator: platform,
+          conditionalMediation: conditional,
+          prfRequiresCeremonyProbe: true
+        }, null, 2);
+      });
+    </script>
+  </body>
+</html>

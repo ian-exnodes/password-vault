@@ -31,3 +31,11 @@ Do not record a task as completed without stating how it was verified. If later 
 - Verification: Confirmed the new directory exists at `/Users/vyhocgioi/ian-basement/password-vault` and the old directory no longer exists.
 - Decisions: Push only after a whole phase satisfies its exit criteria and its documentation is updated. No push will be attempted until the GitHub remote and target branch are provided.
 - Follow-up: Configure the GitHub remote when the repository URL is supplied.
+
+## 2026-09-04 — Phase 0 / Product design and threat model
+
+- Status: Completed
+- Outcome: Delivered a threat model with trust boundaries and 16 abuse cases; versioned AES-GCM/Argon2id crypto and key-lifecycle specification; authentication, recovery, new-device, lost-device, import/export, and deletion flows; ADR for the modular-monolith stack; low-fidelity mobile wireframes; WCAG-oriented accessibility requirements; and measurable gates for Phases 1–6 and future multi-user rollout. Added crypto and WebAuthn capability proofs of concept.
+- Verification: `npm run poc:crypto` passed Vault Key wrap/unwrap, item encryption/decryption, one-bit tamper rejection, and wrong-password rejection using Argon2id plus Web Crypto AES-256-GCM. The measured desktop KDF run was 36 ms and is not treated as a mobile benchmark. `npm audit --omit=dev` reported 0 vulnerabilities. JSON manifests parsed successfully, every required Phase 0 artifact was non-empty, and `git diff --check` passed.
+- Decisions: Use explicit zero-knowledge client encryption; keep authentication separate from vault unlock; use passkey PRF quick unlock only after ceremony-level support is proven; use a Next.js/TypeScript modular monolith with PostgreSQL/Drizzle; cache only the public PWA shell; keep all item fields inside ciphertext; require Node.js 22 LTS before application scaffolding; and retain cross-user authorization gates from MVP.
+- Follow-up: Start Phase 1. Upgrade/pin the development runtime from Node.js 18 to Node.js 22 LTS before scaffolding. Benchmark and dependency-review the Argon2id candidate on real supported phones during Phase 2.
