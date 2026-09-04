@@ -55,3 +55,11 @@ Do not record a task as completed without stating how it was verified. If later 
 - Verification: Opened `http://192.168.1.223:3107` with Playwright, clicked `Unlock demo vault`, observed the `Your vault` heading, and recorded no page errors. The local route is reachable over the current machine's network interface.
 - Decisions: Keep the mobile preview port explicit and separate from other local apps. If the machine's LAN IP changes, update `allowedDevOrigins` in `next.config.ts` or add the new address before testing.
 - Follow-up: Run the same command from the terminal and complete the real-device/manual checklist; do not enter real credentials in this fixture prototype.
+
+## 2026-09-04 — Phase 1 / Owner smoke test and pause
+
+- Status: Partially completed
+- Outcome: The project owner smoke-tested the Phase 1 prototype on a phone and confirmed the LAN preview and unlock interaction are usable enough to continue.
+- Verification: Owner confirmed the mobile page opens through the LAN URL and the unlock buttons respond. Automated gates remain green: 21 Playwright tests passed across Android Chromium, iOS WebKit, exact responsive widths, keyboard activation, touch targets, and light/dark axe scans; unit, build, lint, and high-severity audit checks passed.
+- Decisions: Push the current implementation as a checkpoint while keeping Phase 1 formally open. Do not claim VoiceOver/TalkBack, complete usability timing, or final visual approval until those manual checks are explicitly completed.
+- Follow-up: Resume tomorrow with `docs/phase-1/MANUAL_VALIDATION.md`, complete the remaining real-device checks, then either close Phase 1 and move to Phase 2 or record requested UI changes.
