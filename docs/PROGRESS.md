@@ -47,3 +47,11 @@ Do not record a task as completed without stating how it was verified. If later 
 - Verification: `npm run lint`, `npm test`, and `npm run build` passed. Search tests cover 1,000 records below the 100 ms budget. The final Playwright matrix passed 21 tests and intentionally skipped 3 duplicate exact-width runs: Android Chromium, iOS WebKit, 320 px mobile, desktop, exact 320/360/390/768/1280 widths, keyboard activation, 44 px primary targets, light/dark axe scans, and fixture usability flows. Visual screenshots were inspected at a Pixel 7 viewport. `npm audit --audit-level=high` reports 0 vulnerabilities.
 - Decisions: Use a dedicated production-mode server on port 3107 for E2E isolation. Avoid third-party fonts/resources in the vault origin. Keep the phase In progress until the project owner approves the usability script and real-device VoiceOver/TalkBack checks; do not push before that gate passes.
 - Follow-up: Obtain project-owner mobile, VoiceOver, TalkBack, and visual sign-off using `docs/phase-1/MANUAL_VALIDATION.md`.
+
+## 2026-09-04 — Phase 1 / LAN mobile preview fix
+
+- Status: Completed
+- Outcome: Added the `dev:mobile` command to bind Next.js to the LAN on port 3107 and allow the current development host (`192.168.1.223`) to hydrate correctly from a phone. Removed a stale Next dev process that was occupying a conflicting port.
+- Verification: Opened `http://192.168.1.223:3107` with Playwright, clicked `Unlock demo vault`, observed the `Your vault` heading, and recorded no page errors. The local route is reachable over the current machine's network interface.
+- Decisions: Keep the mobile preview port explicit and separate from other local apps. If the machine's LAN IP changes, update `allowedDevOrigins` in `next.config.ts` or add the new address before testing.
+- Follow-up: Run the same command from the terminal and complete the real-device/manual checklist; do not enter real credentials in this fixture prototype.
