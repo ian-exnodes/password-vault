@@ -185,10 +185,10 @@ Phase record: see `docs/PROGRESS.md` and the reviewed artifacts under `docs/phas
 
 ### Phase 1 — Mobile UI prototype
 
-Status: Not started
+Status: In progress
 
-- [ ] Build the responsive application shell and bottom navigation.
-- [ ] Build mocked Vault list, detail, add/edit, Favorites, Generator, and Settings screens.
+- [x] Build the responsive application shell and bottom navigation.
+- [x] Build mocked Vault list, detail, add/edit, Favorites, Generator, and Settings screens.
 - [ ] Verify keyboard, screen-reader, touch-target, light/dark, and 360 px behavior.
 
 Exit criteria: all primary flows work with fixture data on current Safari iOS and Chrome Android viewports.
