@@ -195,13 +195,14 @@ Exit criteria: all primary flows work with fixture data on current Safari iOS an
 
 ### Phase 2 — Client cryptography core
 
-Status: Not started
+Status: In progress (started 2026-09-04)
 
-- [ ] Implement Vault Key generation and wrapping.
-- [ ] Implement Argon2id derivation with stored, versioned parameters.
-- [ ] Implement per-item authenticated encryption with unique nonces.
-- [ ] Implement memory/state cleanup and automatic locking.
-- [ ] Test round trips, wrong passwords, tampering, nonce uniqueness, and crypto-version migration.
+- [x] Implement Vault Key generation and wrapping.
+- [x] Implement Argon2id derivation with stored, versioned parameters.
+- [x] Implement per-item authenticated encryption with unique nonces.
+- [x] Implement memory/state cleanup and automatic locking.
+- [x] Test round trips, wrong passwords, tampering, nonce uniqueness, and crypto-version migration.
+- [ ] Benchmark and approve the version 1 Argon2id profile on representative supported phones.
 
 Exit criteria: reviewed crypto tests pass and the UI contains no real credentials before this phase completes.
 
@@ -287,3 +288,7 @@ Push to GitHub after an entire phase meets its exit criteria and its plan/progre
 ### 2026-09-04 — Phase 0 architecture baseline
 
 Use a Next.js/TypeScript modular monolith, PostgreSQL with Drizzle, Web Crypto AES-GCM, an Argon2id WASM candidate, SimpleWebAuthn, Zod, Vitest, Playwright, and Node.js 22 LTS. Passkeys authenticate users; quick vault unlock is offered only when WebAuthn PRF succeeds, otherwise the master password or Recovery Key remains required.
+
+### 2026-09-04 — Phase 2 browser-secret lifecycle
+
+Keep the non-extractable Vault Key in an in-memory session only. Lock after five minutes of inactivity or 30 seconds of sustained backgrounding, clear selected plaintext UI state on lock, and attempt clipboard cleanup after 30 seconds only when the clipboard still contains the value copied by this application. Never overwrite newer clipboard content.

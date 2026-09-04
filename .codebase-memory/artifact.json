@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "41d8111529b850547fafeeea334a9f2e1253a34f",
-    "indexed_at": "2026-09-04T03:16:28Z",
+    "commit": "98722c9234239e091a291d6052e848ecde19cbd0",
+    "indexed_at": "2026-09-04T04:56:46Z",
     "project": "password-vault",
     "nodes": 103,
     "edges": 153,
-    "original_size": 1179648,
-    "compressed_size": 18509,
-    "compression_level": 9
+    "original_size": 1966080,
+    "compressed_size": 136634,
+    "compression_level": 3
 }

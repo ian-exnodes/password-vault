@@ -92,3 +92,26 @@ test("required responsive widths have no horizontal overflow", async ({ page }, 
     expect(overflow, `${width}px viewport has horizontal overflow`).toBe(false);
   }
 });
+
+test("does not persist or transmit vault secrets from the client session", async ({ page }) => {
+  const requestBodies: string[] = [];
+  page.on("request", (request) => {
+    const body = request.postData();
+    if (body) requestBodies.push(body);
+  });
+  await unlock(page);
+  await page.getByRole("button", { name: "Open GitHub" }).click();
+  await page.getByRole("button", { name: "Reveal GitHub password" }).click();
+
+  const persisted = await page.evaluate(async () => ({
+    local: { ...localStorage },
+    session: { ...sessionStorage },
+    cookies: document.cookie,
+    cacheNames: "caches" in window ? await caches.keys() : [],
+  }));
+  expect(persisted.cacheNames).toEqual([]);
+  expect(persisted.local).toEqual({});
+  expect(persisted.session).toEqual({});
+  expect(persisted.cookies).not.toContain("Fixture!GitHub#2026");
+  expect(requestBodies.join("\n")).not.toContain("Fixture!GitHub#2026");
+});

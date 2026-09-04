@@ -27,8 +27,11 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPassword, filterItems, fixtureItems, type VaultItem } from "@/lib/vault-items";
+import { generateVaultKey } from "@/lib/crypto/core";
+import { VaultSession, type LockReason } from "@/lib/crypto/session";
+import { ClipboardExpiry, VaultLifecycle } from "@/lib/security/lifecycle";
 
 type Tab = "vault" | "favorites" | "generator" | "settings";
 
@@ -56,6 +59,8 @@ export function VaultApp() {
   const [selected, setSelected] = useState<VaultItem | null>(null);
   const [editing, setEditing] = useState<VaultItem | null | "new">(null);
   const [announcement, setAnnouncement] = useState("");
+  const session = useRef(new VaultSession());
+  const clipboardExpiry = useRef<ClipboardExpiry | null>(null);
 
   const visibleItems = useMemo(() => {
     const base = tab === "favorites" ? items.filter((item) => item.favorite) : items;
@@ -67,9 +72,41 @@ export function VaultApp() {
     window.setTimeout(() => setAnnouncement(message), 10);
   }
 
+  const lockVault = useCallback((reason: LockReason) => {
+    session.current.lock(reason);
+    void clipboardExpiry.current?.clearIfUnchanged();
+    setSelected(null);
+    setEditing(null);
+    setQuery("");
+    setLocked(true);
+  }, []);
+
+  async function unlockVault() {
+    session.current.unlock(await generateVaultKey());
+    setLocked(false);
+  }
+
+  useEffect(() => {
+    if (locked) return;
+    const lifecycle = new VaultLifecycle((reason) => lockVault(reason));
+    const activityEvents = ["pointerdown", "keydown", "touchstart"] as const;
+    const onActivity = () => lifecycle.activity();
+    const onVisibility = () => document.visibilityState === "hidden" ? lifecycle.background() : lifecycle.foreground();
+    activityEvents.forEach((event) => window.addEventListener(event, onActivity, { passive: true }));
+    document.addEventListener("visibilitychange", onVisibility);
+    lifecycle.start();
+    return () => {
+      lifecycle.stop();
+      activityEvents.forEach((event) => window.removeEventListener(event, onActivity));
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [locked, lockVault]);
+
   async function copyValue(value: string, label: string) {
     try {
       await navigator.clipboard.writeText(value);
+      clipboardExpiry.current ??= new ClipboardExpiry(navigator.clipboard);
+      clipboardExpiry.current.schedule(value);
     } catch {
       // Clipboard permission varies in embedded/mobile test contexts; feedback remains useful.
     }
@@ -87,7 +124,7 @@ export function VaultApp() {
   }
 
   if (locked) {
-    return <UnlockScreen onUnlock={() => setLocked(false)} />;
+    return <UnlockScreen onUnlock={unlockVault} />;
   }
 
   return (
@@ -95,7 +132,7 @@ export function VaultApp() {
       <div className="desktop-rail">
         <div className="rail-brand"><BrandMark small /><span>Vault</span></div>
         <Navigation tab={tab} setTab={setTab} desktop />
-        <button className="rail-lock" type="button" onClick={() => setLocked(true)}><Lock size={18} />Lock vault</button>
+        <button className="rail-lock" type="button" onClick={() => lockVault("manual")}><Lock size={18} />Lock vault</button>
       </div>
 
       <section className="app-content">
@@ -111,11 +148,11 @@ export function VaultApp() {
             onCopy={copyValue}
             onToggleFavorite={(id) => setItems((current) => current.map((item) => item.id === id ? { ...item, favorite: !item.favorite } : item))}
             onAdd={() => setEditing("new")}
-            onLock={() => setLocked(true)}
+            onLock={() => lockVault("manual")}
           />
         )}
         {tab === "generator" && <GeneratorView onCopy={copyValue} />}
-        {tab === "settings" && <SettingsView onLock={() => setLocked(true)} />}
+        {tab === "settings" && <SettingsView onLock={() => lockVault("manual")} />}
       </section>
 
       <Navigation tab={tab} setTab={setTab} />
@@ -137,7 +174,7 @@ export function VaultApp() {
   );
 }
 
-function UnlockScreen({ onUnlock }: { onUnlock: () => void }) {
+function UnlockScreen({ onUnlock }: { onUnlock: () => void | Promise<void> }) {
   const [masterMode, setMasterMode] = useState(false);
   const [password, setPassword] = useState("");
 
