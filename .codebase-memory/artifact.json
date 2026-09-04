@@ -1,0 +1,11 @@
+{
+    "schema_version": 2,
+    "commit": "HEAD",
+    "indexed_at": "2026-09-04T02:50:49Z",
+    "project": "password-vault",
+    "nodes": 22,
+    "edges": 21,
+    "original_size": 1179648,
+    "compressed_size": 4020,
+    "compression_level": 9
+}
