@@ -1,6 +1,6 @@
 # Personal Password Vault — Product Plan
 
-Last updated: 2026-09-04
+Last updated: 2026-09-07
 
 ## Product direction
 
@@ -208,16 +208,18 @@ Exit criteria: reviewed crypto tests pass and the UI contains no real credential
 
 ### Phase 3 — Backend and synchronization
 
-Status: Not started
+Status: Completed (2026-09-07)
 
-- [ ] Add database migrations and explicit user/vault ownership.
-- [ ] Build APIs that accept and return encrypted blobs only.
-- [ ] Add revision-based conflict handling.
-- [ ] Add secure session cookies, CSRF protection, rate limits, and device revocation.
-- [ ] Add cross-user authorization tests despite only one enabled MVP user.
-- [ ] Verify database backup and restore.
+- [x] Add database migrations and explicit user/vault ownership.
+- [x] Build APIs that accept and return encrypted blobs only.
+- [x] Add revision-based conflict handling.
+- [x] Add secure session cookies, CSRF protection, rate limits, and device revocation.
+- [x] Add cross-user authorization tests despite only one enabled MVP user.
+- [x] Verify database backup and restore.
 
 Exit criteria: a stolen database cannot reveal vault contents, and authorization tests reject all cross-user access.
+
+Phase record: see `docs/PROGRESS.md`, generated migrations under `drizzle/`, and the encrypted backup/restore verification under `tests/unit/backup-restore.test.ts`.
 
 ### Phase 4 — Passkeys and recovery
 
@@ -292,3 +294,19 @@ Use a Next.js/TypeScript modular monolith, PostgreSQL with Drizzle, Web Crypto A
 ### 2026-09-04 — Phase 2 browser-secret lifecycle
 
 Keep the non-extractable Vault Key in an in-memory session only. Lock after five minutes of inactivity or 30 seconds of sustained backgrounding, clear selected plaintext UI state on lock, and attempt clipboard cleanup after 30 seconds only when the clipboard still contains the value copied by this application. Never overwrite newer clipboard content.
+
+### 2026-09-07 — Owner scope at the repository boundary
+
+Require an authenticated `ownerId` on every vault repository operation and join through `vaults.user_id`; routes must not fetch an item first and authorize it afterward. Foreign and missing resource identifiers return the same non-disclosing result. Ciphertext updates use revision compare-and-swap so concurrent writes cannot silently overwrite each other.
+
+### 2026-09-07 — Hashed sessions and session-bound CSRF
+
+Issue independent 256-bit session and CSRF tokens and persist only their SHA-256 hashes. Use a `__Host-` prefixed `HttpOnly; Secure; SameSite=Strict` session cookie and a readable `__Host-` CSRF cookie. Every mutation must authenticate the session, require an exact same-origin `Origin`, match CSRF cookie to header in constant time, and match its hash to the active session record. Apply idle and absolute expiry, and scope device listing/revocation by authenticated owner.
+
+### 2026-09-07 — Database-backed rate limits
+
+Use atomic PostgreSQL time buckets for security-relevant API limits so multiple application instances share enforcement state. Hash the user/operation bucket key before persistence, isolate scopes and windows, and reject over-limit mutations before repository writes.
+
+### 2026-09-07 — Encrypted backup verification
+
+Verify physical database backup/restore with actual Phase 2 ciphertext: restore into a clean PostgreSQL-compatible engine, compare item counts, revisions, and ciphertext digests, then prove the restored envelope and item still decrypt client-side. Keep a pinned PostgreSQL `pg_dump`/`pg_restore` Docker rehearsal for deployment environments and repeat that production-like drill in Phase 6.

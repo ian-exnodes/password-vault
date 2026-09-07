@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788748742537,
+      "tag": "0000_phase_3_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788752068758,
+      "tag": "0001_secure_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788752339773,
+      "tag": "0002_rate_limits",
+      "breakpoints": true
+    }
+  ]
+}
